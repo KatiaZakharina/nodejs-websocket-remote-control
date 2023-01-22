@@ -4,7 +4,11 @@
 
 ## Installation
 1. Clone/download repo
-2. `npm install`
+2. Switch to the `development` branch
+3. `npm install`
+
+## Preparation
+1. Rename `.env.example` to `.env`
 
 ## Usage
 **Development**
