@@ -1,4 +1,4 @@
-import { WebSocketServer } from 'ws';
+import { WebSocketServer, createWebSocketStream } from 'ws';
 
 import { MESSAGES } from './../constants';
 import motionService from '../services/motion.service';
@@ -9,7 +9,12 @@ const listen = (port: number) => {
   const wss = new WebSocketServer({ port });
 
   wss.on('connection', (ws) => {
-    ws.on('message', async (message) => {
+    const duplex = createWebSocketStream(ws, {
+      encoding: 'utf8',
+      decodeStrings: false,
+    });
+
+    duplex.on('data', async (message) => {
       const stringifiedMessage = message.toString();
       let wsResponse = replaceSpaces(stringifiedMessage);
 
@@ -54,14 +59,12 @@ const listen = (port: number) => {
           }
           break;
         default:
-          ws.send(replaceSpaces(MESSAGES.COMMAND_NOT_FOUND));
+          duplex.write(replaceSpaces(MESSAGES.COMMAND_NOT_FOUND));
           break;
       }
 
-      ws.send(wsResponse);
+      duplex.write(wsResponse);
     });
-
-    ws.on('close', () => {});
   });
 
   return wss;
