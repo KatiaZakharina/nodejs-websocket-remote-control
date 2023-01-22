@@ -1,6 +1,6 @@
 import { WebSocketServer } from 'ws';
 
-import { ERROR_MESSAGES } from './../constants';
+import { MESSAGES } from './../constants';
 import motionService from '../services/motion.service';
 import { parseCommand } from '../helpers/get-args';
 import { replaceSpaces } from '../helpers/replace-spaces';
@@ -9,13 +9,9 @@ const listen = (port: number) => {
   const wss = new WebSocketServer({ port });
 
   wss.on('connection', (ws) => {
-    console.log('connection');
-
     ws.on('message', async (message) => {
       const stringifiedMessage = message.toString();
       let wsResponse = replaceSpaces(stringifiedMessage);
-
-      console.log(`Received message => ${stringifiedMessage}`);
 
       const { commandName, coordinates } = parseCommand(stringifiedMessage);
 
@@ -53,18 +49,22 @@ const listen = (port: number) => {
             if ((error as any).message) {
               wsResponse = replaceSpaces((error as any).message);
             } else {
-              wsResponse = replaceSpaces(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+              wsResponse = replaceSpaces(MESSAGES.SOMETHING_WENT_WRONG);
             }
           }
           break;
         default:
-          ws.send(replaceSpaces(ERROR_MESSAGES.COMMAND_NOT_FOUND));
+          ws.send(replaceSpaces(MESSAGES.COMMAND_NOT_FOUND));
           break;
       }
 
       ws.send(wsResponse);
     });
+
+    ws.on('close', () => {});
   });
+
+  return wss;
 };
 
 export default { listen };
