@@ -50,12 +50,8 @@ const listen = (port: number) => {
           try {
             const image = await motionService.printScreen();
             wsResponse = `${commandName} ${image}`;
-          } catch (error) {
-            if ((error as any).message) {
-              wsResponse = replaceSpaces((error as any).message);
-            } else {
-              wsResponse = replaceSpaces(MESSAGES.SOMETHING_WENT_WRONG);
-            }
+          } catch {
+            wsResponse = replaceSpaces(MESSAGES.OUT_OF_AREA);
           }
           break;
         default:
